@@ -1,7 +1,7 @@
 {
   "name": "Burmese Popper",
   "version": "1.0",
-  "description": "Just Another Zawgyi <=> Unicode Converter",
+  "description": "A Zawgyi/Unicode Converter with Popover",
   "browser_action": {
     "default_title": "Burmese Popper: Select any text on the page to convert Zawgyi to Unicode and vice versa"
   },
