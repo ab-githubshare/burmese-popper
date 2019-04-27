@@ -1,18 +1,18 @@
 {
-  "name": "Burmese Converter",
+  "name": "Burmese Popper",
   "version": "1.0",
   "description": "Just Another Zawgyi <=> Unicode Converter",
   "browser_action": {
-    "default_title": "Burmese Converter: Select any text on the page to convert Zawgyi to Unicode"
-  },
-  "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "default_title": "Burmese Popper: Select any text on the page to convert Zawgyi to Unicode and vice versa"
   },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content_script.js"]
+      "js": [
+        "burmese_popper.js",
+        "zawgyi_converter.min.js",
+        "zawgyi_detector.min.js"
+      ]
     }
   ],
   "icons": {
