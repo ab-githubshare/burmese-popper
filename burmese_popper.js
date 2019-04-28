@@ -1,12 +1,15 @@
 
 document.addEventListener('mouseup', function(event) {
     var selectedText = window.getSelection().toString();
+    var target = event.target;
+
+    // if there is selected text
     if (selectedText) {
-        if (event.target.getAttribute('id') === 'burmese-my') {
-            var copyText = event.target.childNodes[0];
+        if (target.getAttribute('id') === 'burmese-my') {
+            // when click on the popover, copy the text to clipboard
+            var copyText = target.childNodes[0];
             copyText.select();
             document.execCommand('copy');
-            console.log(copyText.value);
             return;
         }
 
@@ -16,28 +19,40 @@ document.addEventListener('mouseup', function(event) {
         const score     = detector.getZawgyiProbability(selectedText);
 
         if (score === -Infinity) {
+            // No Burmese detected
             return;
         }
 
+        var zawgyi = false;
         if (score > THRESHOLD) {
-            console.log('zawgyi');
+            // Zawgyi detected
             selectedText = converter.zawgyiToUnicode(selectedText);
         } else if (score <= THRESHOLD) {
-            console.log('uni');
+            // Unicode detected
             selectedText = converter.unicodeToZawgyi(selectedText);
+            zawgyi = true;
         } else {
             return;
         }
 
-        const viewportOffset = event.target.getBoundingClientRect();
-        const top  = viewportOffset.top - event.target.offsetHeight - 15;
-        const left = viewportOffset.left;
+        const doc = document.documentElement;
+        const scrollLeft = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+        const scrollTop = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+
+        const viewportOffset = target.getBoundingClientRect();
+        const top = (viewportOffset.top + scrollTop) - target.offsetHeight - 15;
+        const left = viewportOffset.left + scrollLeft;
 
         var elem = createPopupOver();
+        // Adjust the position of the popover
         elem.style.top  = top + 'px';
         elem.style.left = left + 'px';
+        if (zawgyi) {
+            elem.style.fontFamily = 'Zawgyi-One';
+        }
         elem.innerHTML  = '<input type="text" value="' + selectedText + '" style="position:absolute;left:-9999px" />' + selectedText
     } else {
+        // When there is no selected text, remove popover
         removePopOver();
     }
 });
@@ -46,6 +61,9 @@ document.addEventListener('mousedown', function() {
     removePopOver();
 });
 
+/**
+ * Create popover element
+ */
 function createPopupOver() {
     var elem = document.querySelector('#burmese-my');
     if (elem) {
@@ -59,7 +77,7 @@ function createPopupOver() {
             + 'position: absolute;'
             + 'color: #fff;'
             + 'padding: 8px 8px 10px;'
-            + 'z-index: 1000;';
+            + 'z-index: 10000;';
         elem.setAttribute('id', 'burmese-my')
         document.body.appendChild(elem);
     }
@@ -67,6 +85,9 @@ function createPopupOver() {
     return elem;
 }
 
+/**
+ * Remove popover element
+ */
 function removePopOver() {
     var selectedText = window.getSelection().toString();
     if (!selectedText) {
